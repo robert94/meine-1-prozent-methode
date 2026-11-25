@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f8fa">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="1% Methode">
+  <meta name="description" content="Lokale, offlinefähige Gewohnheits-, Produktivitäts- und Belohnungs-App mit einfacher Plus-Minus-Bewertung.">
+  <meta name="color-scheme" content="light">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./assets/icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Meine 1%-Methode</title>
+</head>
+<body>
+  <div id="app" class="app-shell">
+    <aside class="sidebar" aria-label="Hauptnavigation">
+      <div class="brand"><div class="brand-icon" aria-hidden="true">1<span>%</span></div><div><strong>Meine 1%-Methode</strong><small>Dein Tag. Deine Punkte.</small></div></div>
+      <nav id="sidebar-nav" class="nav-list"></nav>
+      <div class="sidebar-bottom"><div class="sidebar-tip"><span class="sparkle">✳</span><p><strong>Einfach dranbleiben.</strong><br>Plus für Fortschritte, Minus für Rückschritte. Jeder Tag zählt neu.</p></div><span class="version">Version 3.3 · lokal &amp; offline</span></div>
+    </aside>
+    <main class="main-content" id="main-content" tabindex="-1"><div id="view"><section class="card card-pad"><h1>Meine 1%-Methode</h1><p>Die App benötigt JavaScript. Eine Vorschau aus der iPhone-Dateien-App führt die Anwendung möglicherweise nicht aus. Öffne die installierte Web-App über Safari.</p></section></div></main>
+    <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile Navigation"></nav>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <dialog id="habit-dialog" class="habit-dialog" aria-labelledby="habit-dialog-title">
+    <form id="habit-form" novalidate>
+      <div class="dialog-heading"><div><p class="eyebrow">GEWOHNHEITEN</p><h2 id="habit-dialog-title">Neue Gewohnheit</h2></div><button class="icon-button" type="button" data-close="habit-dialog" aria-label="Schließen">×</button></div>
+      <input type="hidden" id="habit-id">
+      <label class="field-label" for="habit-name">Bezeichnung</label>
+      <input id="habit-name" class="text-input" maxlength="90" required placeholder="z. B. Sport gemacht">
+      <label class="field-label" for="habit-description">Beschreibung (optional)</label>
+      <input id="habit-description" class="text-input" maxlength="160" placeholder="Woran erkenne ich die Gewohnheit?">
+      <fieldset class="field-group"><legend>Art</legend><div class="choice-row"><label class="radio-pill positive"><input type="radio" name="habit-kind" value="positive" checked><span>＋ Positiv</span></label><label class="radio-pill negative"><input type="radio" name="habit-kind" value="negative"><span>− Negativ</span></label></div></fieldset>
+      <fieldset class="field-group"><legend>Wann soll sie angezeigt werden?</legend><div class="choice-row"><label class="radio-pill"><input type="radio" name="habit-schedule" value="daily" checked><span>Täglich</span></label><label class="radio-pill"><input type="radio" name="habit-schedule" value="weekdays"><span>Mo–Fr</span></label><label class="radio-pill"><input type="radio" name="habit-schedule" value="weekend"><span>Sa–So</span></label></div></fieldset>
+      <p class="helper-text">Die Punkte vergibst du jeden Tag individuell mit + und −.</p>
+      <div class="dialog-actions"><button type="button" class="button ghost" data-close="habit-dialog">Abbrechen</button><button type="submit" class="button primary">Speichern</button></div>
+    </form>
+  </dialog>
+  <dialog id="activity-dialog" class="habit-dialog" aria-labelledby="activity-dialog-title">
+    <form id="activity-form" novalidate>
+      <div class="dialog-heading"><div><p class="eyebrow">EINMALIGE AKTIVITÄT</p><h2 id="activity-dialog-title">Aktivität umbenennen</h2></div><button class="icon-button" type="button" data-close="activity-dialog" aria-label="Schließen">×</button></div>
+      <input type="hidden" id="activity-id"><label class="field-label" for="activity-name">Bezeichnung</label>
+      <input id="activity-name" class="text-input" maxlength="90" required>
+      <p class="helper-text">Die Punkte änderst du mit + und − direkt in der Liste.</p>
+      <div class="dialog-actions"><button type="button" class="button ghost" data-close="activity-dialog">Abbrechen</button><button type="submit" class="button primary">Speichern</button></div>
+    </form>
+  </dialog>
+  <dialog id="reward-dialog" class="habit-dialog" aria-labelledby="reward-dialog-title">
+    <form id="reward-form" novalidate>
+      <div class="dialog-heading"><div><p class="eyebrow">BELONUNGSSYSTEM</p><h2 id="reward-dialog-title">Neuer Wunsch</h2></div><button class="icon-button" type="button" data-close="reward-dialog" aria-label="Schließen">×</button></div>
+      <input type="hidden" id="reward-id">
+      <label class="field-label" for="reward-name">Was möchtest du dir gönnen?</label>
+      <input id="reward-name" class="text-input" maxlength="90" required placeholder="z. B. Neues Schachbuch">
+      <label class="field-label" for="reward-cost">Benötigte Punkte</label>
+      <input id="reward-cost" class="text-input" type="number" min="1" max="1000000" step="1" required placeholder="z. B. 150" inputmode="numeric">
+      <p class="helper-text">Lege den Punktepreis selbst fest. Alle Wünsche nutzen dasselbe Guthaben.</p>
+      <div class="dialog-actions"><button type="button" class="button ghost" data-close="reward-dialog">Abbrechen</button><button type="submit" class="button primary">Speichern</button></div>
+    </form>
+  </dialog>
+  <script defer src="./app.js"></script>
+</body>
+</html>
