@@ -166,3 +166,13 @@
  .manage-row .manage-actions .icon-button{width:28px;min-width:28px;height:31px;padding:5px}
  .delete-habit-dialog .dialog-actions .button{flex:1}
 }
+
+/* Version 3.5: iOS-unabhängige Bestätigungsoberfläche für endgültiges Löschen */
+.delete-modal-backdrop[hidden]{display:none!important}
+.delete-modal-backdrop{position:fixed;z-index:9999;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(21,37,46,.64);padding:calc(12px + env(safe-area-inset-top)) 12px calc(12px + env(safe-area-inset-bottom));overscroll-behavior:contain}
+.delete-habit-panel{width:min(100%,520px);max-height:100%;overflow-y:auto;overscroll-behavior:contain;background:#fff;border-radius:20px;padding:25px;box-shadow:0 15px 90px rgba(10,22,33,.29);-webkit-overflow-scrolling:touch;outline:0}
+.delete-habit-panel .dialog-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:23px}
+.delete-habit-panel .dialog-actions .button{min-height:44px}
+body.delete-dialog-open{overflow:hidden}
+.app-version-marker{font-size:.72rem!important;color:#80908d!important;margin-top:10px!important}
+@media(max-width:720px){.delete-habit-panel{padding:21px 17px}.delete-habit-panel .dialog-actions .button{flex:1}}

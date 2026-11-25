@@ -1,76 +1,18 @@
-MEINE 1%-METHODE – PRODUKTIVVERSION 3.3
-======================================
+Meine 1%-Methode – Version 3.5 (iPhone-Löschpopup korrigiert)
 
-Eine kostenlose Progressive Web App (PWA), die auf dem iPhone als App genutzt
-werden kann. Keine Benutzerkonten, keine Datenbank, kein eigener Server.
-
-NEU IN VERSION 3.3 – WÜNSCHE UND SPARGUTHABEN
-- Unter „Wünsche“ Namen und Punktepreis eines Sparziels angeben.
-- Das Guthaben entspricht allen bisherigen Tagespunkten abzüglich der
-  Punkte, die für Belohnungen eingelöst wurden. Negativpunkte zählen mit.
-- Mehrere Wünsche nutzen ein gemeinsames Guthaben; es gibt keine
-  getrennten, reservierten Punkte pro Wunsch.
-- Sobald das Guthaben reicht, lässt sich ein Wunsch „einlösen“.
-  Das ist eine persönliche Freischaltung und kein realer Einkauf.
-- Einlösungen können rückgängig gemacht werden; dabei werden Punkte
-  wieder gutgeschrieben. Die Tagesstatistik bleibt unverändert.
-- Wünsche, Punktestände und Einlösungen werden mit der JSON-Sicherung
-  exportiert und wiederhergestellt. Das CSV enthält Einlösungen.
-- Bestehende Version-3-Daten werden automatisch zu Version 3.3 migriert,
-  wenn die Installation unter derselben Website-Adresse bleibt.
-
-WAS ENTHALTEN IST
-index.html, app.js, styles.css, sw.js, manifest.webmanifest,
-assets/icon-192.png, assets/icon-512.png, .nojekyll
-
-SCHRITT 1 – EINMALIG AUF GITHUB PAGES VERÖFFENTLICHEN
-1. Bei https://github.com anmelden oder kostenlos registrieren.
-2. Unter https://github.com/new ein Repository anlegen,
-   z. B. 'meine-1-prozent-methode'. Sichtbarkeit: Public.
-3. ZIP auspacken und nur die enthaltenen APP-DATEIEN in das
-   Hauptverzeichnis des Repositorys hochladen (Add file > Upload files).
-   Nicht die ZIP-Datei selbst hochladen.
-4. Settings > Pages öffnen.
-5. Source: Deploy from a branch; Branch: main; Folder: /(root); Save.
-6. Auf die von GitHub dort angezeigte Adresse klicken. Die URL ist meist:
-   https://DEIN-BENUTZERNAME.github.io/meine-1-prozent-methode/
-   Achtung: 'DEIN-BENUTZERNAME' ist durch deinen GitHub-Namen zu ersetzen.
-
-SCHRITT 2 – AUF DEM IPHONE INSTALLIEREN
-1. Auf dem iPhone die veröffentlichte Adresse in Safari öffnen.
-2. Teilen > Zum Home-Bildschirm > Als Web-App öffnen > Hinzufügen.
-3. Die App vom Home-Bildschirm aus einmal mit Internet öffnen.
-4. Test: Eine eigene Aktivität hinzufügen und Punkte verändern.
-5. App komplett schließen, neu öffnen: Die Änderungen müssen bleiben.
-6. Flugmodus einschalten und App erneut öffnen: Sie muss offline laufen.
-7. Erst danach die Beispielsammlung in den eigenen Gewohnheiten anpassen.
-
-SCHRITT 3 – SICHERN, BEVOR DU REGELMÄSSIG TRACKST
-- In der Desktopansicht 'Daten' öffnen, auf dem iPhone über den Tab
-  'Gewohnheiten' > 'Daten & Sicherungen'.
-- Unter 'JSON-Sicherung' eine Datei exportieren und unter 'Dateien' an
-  einen sicheren Ort speichern (z. B. iCloud Drive oder Nextcloud).
-- Eine zweite Installation auf anderem Gerät hat KEINE automatisch
-  synchronisierten Daten. Dafür JSON dort importieren.
-- Wöchentlich eine JSON-Sicherung anlegen.
-- App/Website-Daten nicht löschen und veröffentlichte URL nicht ändern,
-  solange keine Sicherung vorhanden ist.
-- Nie eine JSON-Sicherung in das öffentliche GitHub-Repository hochladen.
-
-DATENSCHUTZ
-GitHub hostet nur Programmdateien. Gewohnheiten, Aktivitäten, Notizen
-und Punkte werden lokal auf dem Gerät gespeichert, nicht in GitHub.
+UPGRADE VON 3.4
+1. Auf dem iPhone unter „Daten“ eine JSON-Sicherung erstellen und in „Dateien“ sichern.
+2. Alle Dateien und den assets-Ordner aus diesem Paket in das bestehende GitHub-Repository hochladen.
+   Bereits vorhandene Dateien mit den gleichen Namen ersetzen und „Commit changes“ ausführen.
+3. Warten, bis GitHub Pages die Aktualisierung veröffentlicht hat.
+4. Die App bei aktiver Internetverbindung zunächst im Safari-Browser öffnen.
+   Danach die Home-Bildschirm-App vollständig schließen und erneut öffnen.
+5. Unter „Daten“ muss „App-Version 3.5 · iPhone-Popup-Fix“ stehen.
+6. Tab „Gewohnheiten“ → Papierkorb: Das Lösch-Overlay muss sichtbar werden.
+   Um sicher zu testen, mit „Abbrechen“ schließen – nichts löschen.
 
 WICHTIG
-Browser-/PWA-Speicher kann gelöscht werden und ist KEIN Backup.
-Ein auf dem Home-Bildschirm installiertes PWA ist zuverlässiger als eine
-HTML-Vorschau aus iOS Dateien, ist aber kein Ersatz für die JSON-Sicherung.
-
-TECHNIK
-- Keine Fremdbibliotheken und keine externen Skripte
-- localStorage für die individuellen Daten
-- Service Worker für Offline-Betrieb nach erstem HTTPS-Aufruf
-- Automatische Datenübernahme vorhandener lokaler V1/V2-Daten, sofern
-  diese auf derselben Website-Origin liegen; sonst JSON-Import nutzen
-- Aktualisierbar: Programmdateien an gleicher URL im GitHub Repository
-  ersetzen. Daten bleiben im lokalen Browser-Speicher des iPhones.
+- Home-Bildschirm-App nicht löschen und Safari-Daten nicht leeren: Die Daten sind lokal gespeichert.
+- Die App benutzt weiterhin denselben localStorage-Schlüssel; die Nutzerdaten bleiben beim Update erhalten.
+- Der Service Worker (Offline-Betrieb) wurde auf v3.5 aktualisiert.
+- Sollte das neue JS noch mit altem HTML geladen werden, erscheint ersatzweise eine native Sicherheitsabfrage.

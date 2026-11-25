@@ -12,7 +12,7 @@
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" href="./assets/icon-192.png">
   <link rel="icon" type="image/png" sizes="192x192" href="./assets/icon-192.png">
-  <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./styles.css?v=3.5">
   <title>Meine 1%-Methode</title>
 </head>
 <body>
@@ -20,7 +20,7 @@
     <aside class="sidebar" aria-label="Hauptnavigation">
       <div class="brand"><div class="brand-icon" aria-hidden="true">1<span>%</span></div><div><strong>Meine 1%-Methode</strong><small>Dein Tag. Deine Punkte.</small></div></div>
       <nav id="sidebar-nav" class="nav-list"></nav>
-      <div class="sidebar-bottom"><div class="sidebar-tip"><span class="sparkle">✳</span><p><strong>Einfach dranbleiben.</strong><br>Plus für Fortschritte, Minus für Rückschritte. Jeder Tag zählt neu.</p></div><span class="version">Version 3.4 · lokal &amp; offline</span></div>
+      <div class="sidebar-bottom"><div class="sidebar-tip"><span class="sparkle">✳</span><p><strong>Einfach dranbleiben.</strong><br>Plus für Fortschritte, Minus für Rückschritte. Jeder Tag zählt neu.</p></div><span class="version">Version 3.5 · lokal &amp; offline</span></div>
     </aside>
     <main class="main-content" id="main-content" tabindex="-1"><div id="view"><section class="card card-pad"><h1>Meine 1%-Methode</h1><p>Die App benötigt JavaScript. Eine Vorschau aus der iPhone-Dateien-App führt die Anwendung möglicherweise nicht aus. Öffne die installierte Web-App über Safari.</p></section></div></main>
     <nav class="bottom-nav" id="bottom-nav" aria-label="Mobile Navigation"></nav>
@@ -61,14 +61,17 @@
       <div class="dialog-actions"><button type="button" class="button ghost" data-close="reward-dialog">Abbrechen</button><button type="submit" class="button primary">Speichern</button></div>
     </form>
   </dialog>
-  <dialog id="delete-habit-dialog" class="habit-dialog delete-habit-dialog" aria-labelledby="delete-habit-title" aria-describedby="delete-habit-impact">
-    <div class="dialog-heading"><div><p class="eyebrow">GEWOHNHEIT ENTFERNEN</p><h2 id="delete-habit-title">Endgültig löschen?</h2></div><button class="icon-button" type="button" data-close="delete-habit-dialog" aria-label="Abbrechen">×</button></div>
-    <p id="delete-habit-name" class="delete-habit-name"></p>
-    <p id="delete-habit-impact" class="delete-impact"></p>
-    <p class="delete-warning"><strong>Wichtig:</strong> Die Gewohnheit verschwindet auch aus vergangenen Tagen. Tagesstatistik und Sparguthaben werden neu berechnet. Bereits eingelöste Wünsche bleiben bestehen; dein Guthaben kann dadurch negativ werden. <strong>Die Löschung lässt sich nicht rückgängig machen.</strong></p>
-    <button class="button outline backup-before-delete" type="button" data-action="export-json">Vorher JSON-Sicherung herunterladen</button>
-    <div class="dialog-actions"><button type="button" class="button ghost" data-close="delete-habit-dialog">Abbrechen</button><button type="button" class="button danger" data-action="confirm-delete-habit">Endgültig löschen</button></div>
-  </dialog>
-  <script defer src="./app.js"></script>
+  <!-- Eigenes Lösch-Overlay statt HTML-dialog: zuverlässiger in iPhone-Home-Screen-Apps. -->
+  <div id="delete-habit-dialog" class="delete-modal-backdrop" hidden>
+    <section class="delete-habit-panel" role="alertdialog" aria-modal="true" aria-labelledby="delete-habit-title" aria-describedby="delete-habit-impact" tabindex="-1">
+      <div class="dialog-heading"><div><p class="eyebrow">GEWOHNHEIT ENTFERNEN</p><h2 id="delete-habit-title">Endgültig löschen?</h2></div><button class="icon-button" type="button" data-close="delete-habit-dialog" aria-label="Abbrechen">×</button></div>
+      <p id="delete-habit-name" class="delete-habit-name"></p>
+      <p id="delete-habit-impact" class="delete-impact"></p>
+      <p class="delete-warning"><strong>Wichtig:</strong> Die Gewohnheit verschwindet auch aus vergangenen Tagen. Tagesstatistik und Sparguthaben werden neu berechnet. Bereits eingelöste Wünsche bleiben bestehen; dein Guthaben kann dadurch negativ werden. <strong>Die Löschung lässt sich nicht rückgängig machen.</strong></p>
+      <button class="button outline backup-before-delete" type="button" data-action="export-json">Vorher JSON-Sicherung herunterladen</button>
+      <div class="dialog-actions"><button type="button" class="button ghost" data-close="delete-habit-dialog">Abbrechen</button><button type="button" class="button danger" data-action="confirm-delete-habit">Endgültig löschen</button></div>
+    </section>
+  </div>
+  <script defer src="./app.js?v=3.5"></script>
 </body>
 </html>

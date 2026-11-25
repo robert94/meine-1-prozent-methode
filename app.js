@@ -1,4 +1,4 @@
-/* Meine 1%-Methode – V3.4. Ohne Backend, Tracking oder Fremdbibliotheken. */
+/* Meine 1%-Methode – V3.5. Ohne Backend, Tracking oder Fremdbibliotheken. */
 (() => {
 'use strict';
 const KEY = 'meine-1-prozent-methode-v1'; // Absichtlich identisch für automatische Datenübernahme aus V1/V2.
@@ -176,7 +176,7 @@ function rewardsView(){const w=wallet(),pending=store.rewards.filter(r=>!r.redee
  `<p class="footnote">Das Einlösen ist eine persönliche Belohnungsmarkierung; ein realer Kauf wird dadurch nicht ausgelöst.</p>`;
 }
 function settingsView(){return page('Daten & Einstellungen.','Keine Cloud, kein Konto, kein Abo.')+
- `<section class="card settings-block"><div class="settings-panel-head">${ico('lock')}<h2>Alles bleibt auf deinem Gerät</h2></div><p>Die App speichert Punkte, Gewohnheiten, Aktivitäten, Wünsche und Notizen ausschließlich im lokalen Browser-Speicher. Es gibt keinen Server für deine Daten und keine automatische Synchronisierung.</p><div class="warning"><strong>Bitte sichern:</strong> Beim Löschen von Browserdaten, beim Gerätewechsel oder beim Entfernen der Web-App können Daten verlorengehen. Erstelle regelmäßig eine JSON-Sicherung.</div></section>`+
+ `<section class="card settings-block"><div class="settings-panel-head">${ico('lock')}<h2>Alles bleibt auf deinem Gerät</h2></div><p>Die App speichert Punkte, Gewohnheiten, Aktivitäten, Wünsche und Notizen ausschließlich im lokalen Browser-Speicher. Es gibt keinen Server für deine Daten und keine automatische Synchronisierung.</p><p class="app-version-marker">App-Version 3.5 · iPhone-Popup-Fix</p><div class="warning"><strong>Bitte sichern:</strong> Beim Löschen von Browserdaten, beim Gerätewechsel oder beim Entfernen der Web-App können Daten verlorengehen. Erstelle regelmäßig eine JSON-Sicherung.</div></section>`+
  `<section class="card settings-block"><div class="settings-panel-head">${ico('download')}<h2>Sichern &amp; Wiederherstellen</h2></div><div class="settings-actions"><button class="button primary" data-action="export-json">${ico('download')} JSON-Sicherung</button><button class="button outline" data-action="export-csv">${ico('file')} CSV-Export</button><button class="button outline" data-action="import">${ico('upload')} JSON importieren</button><input class="file-input" id="import-file" type="file" accept=".json,application/json"></div><p class="footnote">Backups aus Version 1, 2 und 3 werden übernommen. Wünsche und Einlösungen sind in der JSON-Sicherung enthalten. Der Import ersetzt alle aktuellen lokalen Einträge.</p></section>`+
  `<section class="card settings-block"><div class="settings-panel-head">${ico('sun')}<h2>Auf dem iPhone installieren</h2></div><p>Die Website einmalig über eine HTTPS-Adresse in Safari öffnen und „Zum Home-Bildschirm“ wählen. Die installierte Version arbeitet nach dem Laden auch ohne Internet weiter. Eine HTML-Datei aus der Dateien-App ist auf dem iPhone keine zuverlässige Installation.</p></section>`+
  `<section class="card settings-block"><div class="settings-panel-head">${ico('trash')}<h2>Lokale Daten zurücksetzen</h2></div><p>Löscht alle hier gespeicherten Einträge unwiderruflich.</p><button class="button outline" data-action="reset">${ico('trash')} Alles zurücksetzen</button></section>`;
@@ -215,15 +215,30 @@ function openDeleteHabit(id){
   if(Object.hasOwn(e.points,h.id)){affected++;points+=Number(e.points[h.id]);}
  }
  habitToDelete=id;
+ const dialog=$('delete-habit-dialog');
+ if(!dialog || dialog.tagName==='DIALOG' || !$('delete-habit-name') || !$('delete-habit-impact')){
+  // Altes HTML oder eine teilweise zwischengespeicherte Seite: native sichere Rückfrage.
+  if(confirm(`„${h.name}“ endgültig löschen? ${affected} Tage betroffen, ${signed(points)} historische Punkte. Diese Aktion kann nicht rückgängig gemacht werden. Bitte vorher eine JSON-Sicherung erstellen.`))confirmDeleteHabit();
+  else habitToDelete=null;
+  return;
+ }
  $('delete-habit-name').textContent=`„${h.name}“`;
  $('delete-habit-impact').textContent=affected
   ?`Bewertungen an ${affected} ${affected===1?'Tag':'Tagen'} (${signed(points)} Punkte) werden dauerhaft entfernt. Dein Sparguthaben ändert sich dadurch um ${signed(-points)} Punkte.`
   :'Es gibt keine bisherigen Tagespunkte für diese Gewohnheit.';
- $('delete-habit-dialog').showModal();
+ dialog.hidden=false;
+ document.body.classList.add('delete-dialog-open');
+ dialog.querySelector('[role="alertdialog"]')?.focus();
+}
+function closeDeleteHabit(){
+ const dialog=$('delete-habit-dialog');
+ if(dialog)dialog.hidden=true;
+ document.body.classList.remove('delete-dialog-open');
+ habitToDelete=null;
 }
 function confirmDeleteHabit(){
  const h=store.habits.find(x=>x.id===habitToDelete);
- if(!h)return $('delete-habit-dialog').close();
+ if(!h){closeDeleteHabit();return;}
  const backup=JSON.stringify(store);
  store.habits=store.habits.filter(x=>x.id!==h.id);
  for(const e of Object.values(store.days))delete e.points[h.id];
@@ -232,8 +247,7 @@ function confirmDeleteHabit(){
   notice('Löschen fehlgeschlagen. Daten unverändert.');
   return;
  }
- habitToDelete=null;
- $('delete-habit-dialog').close();
+ closeDeleteHabit();
  render();
  notice('Gewohnheit samt bisherigen Punkten gelöscht');
 }
@@ -243,7 +257,8 @@ function exportJSON(){download(`1-prozent-methode-${today}.json`,JSON.stringify(
 function exportCSV(){const rows=[['Datum','Typ','Bezeichnung','Punkte','Notiz']];for(const d of Object.keys(store.days).sort()){const e=entry(d);for(const [id,p] of Object.entries(e.points)){const h=store.habits.find(x=>x.id===id);rows.push([d,'Gewohnheit',h?.name||id,p,e.note]);}for(const a of e.activities)rows.push([d,'Aktivität',a.name,a.points,e.note]);if(!Object.keys(e.points).length&&!e.activities.length&&e.note)rows.push([d,'Notiz','','',e.note]);}for(const r of store.rewards){if(r.redeemedOn)rows.push([r.redeemedOn,'Wunsch eingelöst',r.name,-r.cost,'Abzug nur vom Sparguthaben, nicht vom Tages-Score']);}const encode=s=>'"'+String(s??'').replace(/"/g,'""')+'"';download(`1-prozent-methode-${today}.csv`,'\uFEFF'+rows.map(r=>r.map(encode).join(';')).join('\r\n'),'text/csv;charset=utf-8');notice('CSV-Datei vorbereitet');}
 function importFile(file){if(!file)return;if(file.size>5*1024*1024)return notice('Sicherung ist zu groß.');const r=new FileReader();r.onload=()=>{try{const raw=JSON.parse(r.result);if(!validImport(raw))throw Error('Ungültig');if(!confirm('Import ersetzt alle bisherigen Einträge auf diesem Gerät. Fortfahren?'))return;store=normalized(raw);dataReadFailure=false;if(!save())throw Error('Speichern fehlgeschlagen');day=today;month=today.slice(0,7);show('today');notice('Sicherung importiert');}catch(err){notice('Ungültige Sicherungsdatei');}};r.onerror=()=>notice('Datei konnte nicht gelesen werden');r.readAsText(file);}
 document.addEventListener('click',event=>{
- const close=event.target.closest('[data-close]');if(close){$(close.dataset.close).close();return;}
+ const close=event.target.closest('[data-close]');if(close){if(close.dataset.close==='delete-habit-dialog')closeDeleteHabit();else $(close.dataset.close).close();return;}
+ if(event.target.id==='delete-habit-dialog'){closeDeleteHabit();return;}
  const btn=event.target.closest('[data-action]');if(!btn)return;const action=btn.dataset.action,id=btn.dataset.id;
  if(action==='nav')return show(btn.dataset.view);
  if(action==='add-reward')return editReward(null);
@@ -273,6 +288,7 @@ document.addEventListener('click',event=>{
  if(action==='import')return $('import-file').click();
  if(action==='reset'&&confirm('Alle lokalen Gewohnheiten, Aktivitäten und Punkte löschen?')){store=newStore();dataReadFailure=false;save();day=today;show('today');notice('Daten zurückgesetzt');}
 });
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&$('delete-habit-dialog')&&!$('delete-habit-dialog').hidden)closeDeleteHabit();});
 $('view').addEventListener('submit',e=>{if(e.target.id==='quick-activity-form'){e.preventDefault();newActivity();}});
 $('view').addEventListener('input',e=>{if(e.target.id==='day-note'){ensure(day).note=e.target.value;save();}});
 $('view').addEventListener('change',e=>{if(e.target.id==='import-file'){importFile(e.target.files[0]);e.target.value='';}});
