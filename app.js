@@ -1,4 +1,4 @@
-/* Meine 1%-Methode – V3.3. Ohne Backend, Tracking oder Fremdbibliotheken. */
+/* Meine 1%-Methode – V3.4. Ohne Backend, Tracking oder Fremdbibliotheken. */
 (() => {
 'use strict';
 const KEY = 'meine-1-prozent-methode-v1'; // Absichtlich identisch für automatische Datenübernahme aus V1/V2.
@@ -106,6 +106,7 @@ function validImport(v){
 let dataReadFailure=false;
 function read(){try{const d=localStorage.getItem(KEY);if(!d)return newStore();const obj=JSON.parse(d);if(!validImport(obj))throw Error('Ungültiges Datenformat');if(obj.schema<3&&!localStorage.getItem('meine-1-prozent-methode-backup-vor-v3'))localStorage.setItem('meine-1-prozent-methode-backup-vor-v3',d);if(obj.schema<4&&!localStorage.getItem('meine-1-prozent-methode-backup-vor-v4'))localStorage.setItem('meine-1-prozent-methode-backup-vor-v4',d);return normalized(obj);}catch(err){console.error('Vorhandene lokale Daten konnten nicht gelesen werden. Sie werden NICHT überschrieben.',err);dataReadFailure=true;return newStore();}}
 let store=read();
+let habitToDelete=null;
 function notice(t){const el=$('toast');el.textContent=t;el.classList.add('visible');clearTimeout(toastHandle);toastHandle=setTimeout(()=>el.classList.remove('visible'),2600);}
 function save(){if(dataReadFailure){notice('Datenspeicher beschädigt. Vorhandene Daten nicht überschrieben.');return false;}try{localStorage.setItem(KEY,JSON.stringify(store));return true;}catch(err){console.error(err);notice('Speichern nicht möglich. Bitte Speicher prüfen.');return false;}}
 function entry(d){return store.days[d]||{points:{},activities:[],note:''};}
@@ -155,7 +156,7 @@ function statsView(){const a=period(7),b=period(30),days=Array.from({length:14},
  `<section class="card chart-card"><div class="chart-head"><h2>Gewohnheiten – letzte 30 Tage</h2></div>${ranking.length?ranking.map(x=>`<div class="ranking-row"><span>${html(x.h.name)}</span><strong class="${x.score<0?'negative-score':''}">${signed(x.score)} P.</strong></div>`).join(''):'<p class="small-muted">Noch keine Tagesbewertungen vorhanden.</p>'}</section>`;
 }
 function statCard(v,title,sub){return `<div class="card mini-stat"><div class="stat-label">${title}</div><div class="stat-number">${v}</div><div class="stat-info">${sub}</div></div>`;}
-function habitList(items){return items.map((h,i)=>`<div class="manage-row ${h.archivedOn?'archived':''}"><div class="habit-info"><div class="habit-sign ${h.kind}">${h.kind==='positive'?'+':'−'}</div><div class="habit-label"><strong>${html(h.name)}</strong><small>${h.schedule==='daily'?'Täglich':h.schedule==='weekdays'?'Mo–Fr':'Sa–So'} · ${h.kind==='positive'?'Positiv':'Negativ'}</small></div></div><div class="manage-actions">${!h.archivedOn?`<button class="icon-button" title="Nach oben" data-action="move-up" data-id="${html(h.id)}" ${i===0?'disabled':''}>${ico('up')}</button><button class="icon-button" title="Nach unten" data-action="move-down" data-id="${html(h.id)}" ${i===items.length-1?'disabled':''}>${ico('down')}</button><button class="icon-button" title="Bearbeiten" data-action="edit-habit" data-id="${html(h.id)}">${ico('edit')}</button>`:''}<button class="icon-button" title="${h.archivedOn?'Aktivieren':'Pausieren'}" data-action="${h.archivedOn?'restore-habit':'archive-habit'}" data-id="${html(h.id)}">${ico(h.archivedOn?'restore':'archive')}</button></div></div>`).join('');}
+function habitList(items){return items.map((h,i)=>`<div class="manage-row ${h.archivedOn?'archived':''}"><div class="habit-info"><div class="habit-sign ${h.kind}">${h.kind==='positive'?'+':'−'}</div><div class="habit-label"><strong>${html(h.name)}</strong><small>${h.schedule==='daily'?'Täglich':h.schedule==='weekdays'?'Mo–Fr':'Sa–So'} · ${h.kind==='positive'?'Positiv':'Negativ'}</small></div></div><div class="manage-actions">${!h.archivedOn?`<button class="icon-button" title="Nach oben" data-action="move-up" data-id="${html(h.id)}" ${i===0?'disabled':''}>${ico('up')}</button><button class="icon-button" title="Nach unten" data-action="move-down" data-id="${html(h.id)}" ${i===items.length-1?'disabled':''}>${ico('down')}</button><button class="icon-button" title="Bearbeiten" data-action="edit-habit" data-id="${html(h.id)}">${ico('edit')}</button>`:''}<button class="icon-button" title="${h.archivedOn?'Aktivieren':'Pausieren'}" aria-label="${h.archivedOn?'Gewohnheit aktivieren':'Gewohnheit pausieren'}: ${html(h.name)}" data-action="${h.archivedOn?'restore-habit':'archive-habit'}" data-id="${html(h.id)}">${ico(h.archivedOn?'restore':'archive')}</button><button class="icon-button delete-habit-button" title="Endgültig löschen" aria-label="Gewohnheit endgültig löschen: ${html(h.name)}" data-action="delete-habit" data-id="${html(h.id)}">${ico('trash')}</button></div></div>`).join('');}
 function habitsView(){const hs=allHabits(),active=hs.filter(x=>!x.archivedOn),archived=hs.filter(x=>x.archivedOn);return page('Gewohnheiten.','Hier legst du fest, was du beobachten möchtest.',`<button class="button primary small" data-action="add-habit">${ico('plus')} Neu</button>`)+
  `<div class="intro-panel">Punkte werden nicht mehr fest voreingestellt: Du vergibst sie <strong>jeden Tag direkt mit + und −</strong> in der Tagesansicht.</div>`+
  `<div class="section-head"><div class="section-title"><h2>Aktive Gewohnheiten</h2><span class="count">${active.length}</span></div></div><div class="card manage-list">${active.length?habitList(active):'<div class="empty-state">Noch keine Gewohnheiten angelegt.</div>'}</div>`+
@@ -205,6 +206,37 @@ function undoReward(id){const r=store.rewards.find(r=>r.id===id&&r.redeemedOn);i
  const previous=r.redeemedOn;r.redeemedOn=null;if(!save()){r.redeemedOn=previous;return;}render();notice('Punkte zurückgebucht');}
 function deleteReward(id){const r=store.rewards.find(r=>r.id===id&&!r.redeemedOn);if(!r)return;
  if(!confirm(`Wunsch „${r.name}“ löschen?`))return;const old=store.rewards;store.rewards=old.filter(x=>x.id!==id);if(!save()){store.rewards=old;return;}render();notice('Wunsch gelöscht');}
+// Dauerhaftes Löschen entfernt auch alle historischen Tagespunkte dieser Gewohnheit.
+// Aktivitäten, Notizen und eingelöste Wünsche bleiben erhalten.
+function openDeleteHabit(id){
+ const h=store.habits.find(x=>x.id===id);if(!h)return;
+ let affected=0,points=0;
+ for(const e of Object.values(store.days)){
+  if(Object.hasOwn(e.points,h.id)){affected++;points+=Number(e.points[h.id]);}
+ }
+ habitToDelete=id;
+ $('delete-habit-name').textContent=`„${h.name}“`;
+ $('delete-habit-impact').textContent=affected
+  ?`Bewertungen an ${affected} ${affected===1?'Tag':'Tagen'} (${signed(points)} Punkte) werden dauerhaft entfernt. Dein Sparguthaben ändert sich dadurch um ${signed(-points)} Punkte.`
+  :'Es gibt keine bisherigen Tagespunkte für diese Gewohnheit.';
+ $('delete-habit-dialog').showModal();
+}
+function confirmDeleteHabit(){
+ const h=store.habits.find(x=>x.id===habitToDelete);
+ if(!h)return $('delete-habit-dialog').close();
+ const backup=JSON.stringify(store);
+ store.habits=store.habits.filter(x=>x.id!==h.id);
+ for(const e of Object.values(store.days))delete e.points[h.id];
+ if(!save()){
+  store=JSON.parse(backup);
+  notice('Löschen fehlgeschlagen. Daten unverändert.');
+  return;
+ }
+ habitToDelete=null;
+ $('delete-habit-dialog').close();
+ render();
+ notice('Gewohnheit samt bisherigen Punkten gelöscht');
+}
 function reorder(id,amount){const list=allHabits().filter(h=>!h.archivedOn),i=list.findIndex(h=>h.id===id);if(i<0||i+amount<0||i+amount>=list.length)return;const a=list[i],b=list[i+amount],tmp=a.order;a.order=b.order;b.order=tmp;save();render();}
 function download(name,body,type){const link=document.createElement('a'),url=URL.createObjectURL(new Blob([body],{type}));link.href=url;link.download=name;document.body.append(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(url),10000);}
 function exportJSON(){download(`1-prozent-methode-${today}.json`,JSON.stringify(store,null,2),'application/json;charset=utf-8');notice('JSON-Sicherung vorbereitet');}
@@ -230,6 +262,8 @@ document.addEventListener('click',event=>{
  if(action==='delete-activity'){const a=entry(day).activities.find(x=>x.id===id);if(a&&confirm(`„${a.name}“ löschen?`)){ensure(day).activities=entry(day).activities.filter(x=>x.id!==id);save();render();}return;}
  if(action==='add-habit')return editHabit(null);
  if(action==='edit-habit')return editHabit(id);
+ if(action==='delete-habit')return openDeleteHabit(id);
+ if(action==='confirm-delete-habit')return confirmDeleteHabit();
  if(action==='move-up')return reorder(id,-1);
  if(action==='move-down')return reorder(id,1);
  if(action==='archive-habit'){const h=store.habits.find(x=>x.id===id);if(h&&confirm(`„${h.name}“ pausieren?`)){h.archivedOn=today;save();render();}return;}

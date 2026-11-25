@@ -145,3 +145,24 @@
  .wallet-inline{margin-top:8px;font-size:.74rem}
 }
 @media(max-width:390px){.bottom-nav .nav-link{font-size:.505rem}.bottom-nav .nav-link svg{width:18px;height:18px}}
+
+
+/* V3.4 – explizites dauerhaftes Entfernen, auch aus dem Verlauf */
+.delete-habit-button{color:#ae5c52!important}
+.delete-habit-button:hover{background:#fff1ee!important;border-color:#f1cdc7!important}
+.button.danger{background:#ad5148;color:white;border-color:#ad5148}
+.button.danger:hover{background:#8f3a34}
+.delete-habit-name{font-size:1.02rem;font-weight:760;margin:12px 0 7px;overflow-wrap:anywhere}
+.delete-impact{color:#385b53;background:#eef6f2;border-radius:11px;padding:12px;font-size:.85rem;line-height:1.5;margin-bottom:13px}
+.delete-warning{font-size:.83rem;line-height:1.6;color:#5c6772;margin-bottom:16px}
+.backup-before-delete{white-space:normal;text-align:center;width:100%}
+.delete-habit-dialog .dialog-actions{flex-wrap:wrap;gap:8px}
+.manage-actions .delete-habit-button{flex-shrink:0}
+@media(max-width:720px){
+ .manage-row .habit-info{max-width:none;flex:1 1 0;min-width:0}
+ .manage-row .habit-sign{display:none}
+ .manage-row{gap:5px}
+ .manage-row .manage-actions{flex:0 0 auto;max-width:51%;gap:2px;flex-wrap:nowrap}
+ .manage-row .manage-actions .icon-button{width:28px;min-width:28px;height:31px;padding:5px}
+ .delete-habit-dialog .dialog-actions .button{flex:1}
+}
